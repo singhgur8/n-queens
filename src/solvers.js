@@ -16,7 +16,14 @@
 
 
 window.findNRooksSolution = function(n) {
+  //input: n, the size of the board and the number of pieces
+  //output: matrix representing one solution
   var solution = undefined; //fixme
+  console.log(n);
+
+  if (n === 1) {
+    solution = new Board([[1]]);
+  }
 
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
