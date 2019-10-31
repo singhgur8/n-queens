@@ -57,23 +57,6 @@ window.findNRooksSolution = function (n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function (n) {
-
-  // // reusing code from previous function
-  // for (i = 0; i < n; i++) { // for each row, y coordinates
-  //   for (j = 0; j < n; j++) { // for each column, x coordinates
-  //     board.togglePiece(i, j);
-  //     if (board.hasAnyRooksConflicts()) {
-  //       board.togglePiece(i, j);
-  //     } else {
-  //       counter++;
-  //     }
-  //   }
-  // }
-
-  // if (counter === n) {
-  //   // return solution;
-  // }
-
   //-----------------------------------------------------------------------
 
   //create solutionCounter, piece counter?? where this go, create empty matrix
@@ -82,25 +65,19 @@ window.countNRooksSolutions = function (n) {
   // create inner function
   var inner = function (matrix, rowIndex) {
     for (var col = 0; col < n; col++) {
-      // var clone = matrix.clone();
-      if (n === 2) {
-        // debugger;
-      }
-      // console.log(matrix);
-      // console.log('row', rowIndex, 'col', col);
       matrix.togglePiece(rowIndex, col);
-      console.log('board:');
-      console.log(matrix.get(0));
-      console.log(matrix.get(1));
       if (matrix.hasAnyRooksConflicts()) {
         matrix.togglePiece(rowIndex, col);
       } else {
         pieceCount++;
         if (pieceCount === n) {
           solutionCount++;
-        } else {
+          matrix.togglePiece(rowIndex, col);
+          pieceCount--;
+        } else if (rowIndex + 1 < n) {
           inner(matrix, rowIndex + 1);
           matrix.togglePiece(rowIndex, col);
+          pieceCount--;
         }
       }
     }
@@ -120,12 +97,12 @@ window.countNRooksSolutions = function (n) {
 
 
   //start inner function, with intial inputs: iterate over rows and initialize pieceCount
-  for (var row = 0; row < n; row++) {
-    var board = new Board({ n: n });
-    console.log('created new board');
-    var pieceCount = 0;
-    inner(board, row);
-  }
+  // for (var row = 0; row < n; row++) {
+  var board = new Board({ n: n });
+  // console.log('created new board');
+  var pieceCount = 0;
+  inner(board, 0);
+  // }
   //return solCounter
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
@@ -133,7 +110,59 @@ window.countNRooksSolutions = function (n) {
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function (n) {
-  var solution = undefined; //fixme
+  // var board = new Board({ n: n });
+  // var solution = [];
+
+  // var counter = 0;
+
+  // for (i = 0; i < n; i++) { // for each row, y coordinates
+  //   debugger;
+  //   for (j = 0; j < n; j++) { // for each column, x coordinates
+  //     board.togglePiece(i, j);
+  //     if (board.hasAnyQueensConflicts()) {
+  //       board.togglePiece(i, j);
+  //     } else {
+  //       counter++;
+  //     }
+  //   }
+  // }
+  var solution = [];
+  if (n === 2) {
+    return [[0, 0], [0, 0]];
+  } else if (n === 3) {
+    return [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+  }
+
+  var inner = function (matrix, rowIndex) {
+    if (n === 0) {
+      return [];
+    }
+    for (var col = 0; col < n; col++) {
+      if (solution.length !== 0) {
+        return;
+      }
+      matrix.togglePiece(rowIndex, col);
+      if (matrix.hasAnyQueensConflicts()) {
+        matrix.togglePiece(rowIndex, col);
+      } else {
+        pieceCount++;
+        if (pieceCount === n) {
+          for (i = 0; i < n; i++) {
+            solution.push(board.get(i).slice());
+          }
+          return solution;
+        } else if (rowIndex + 1 < n) {
+          inner(matrix, rowIndex + 1);
+          matrix.togglePiece(rowIndex, col);
+          pieceCount--;
+        }
+      }
+    }
+  };
+
+  var board = new Board({ n: n });
+  var pieceCount = 0;
+  inner(board, 0);
 
   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
   return solution;
@@ -141,8 +170,41 @@ window.findNQueensSolution = function (n) {
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function (n) {
-  var solutionCount = undefined; //fixme
+  var solutionCount = 0;
+  if (n === 0) {
+    return 1;
+  }
+  // create inner function
+  var inner = function (matrix, rowIndex) {
+    for (var col = 0; col < n; col++) {
+      matrix.togglePiece(rowIndex, col);
+      if (matrix.hasAnyQueensConflicts()) {
+        matrix.togglePiece(rowIndex, col);
+      } else {
+        pieceCount++;
+        if (pieceCount === n) {
+          solutionCount++;
+          matrix.togglePiece(rowIndex, col);
+          pieceCount--;
+        } else if (rowIndex + 1 < n) {
+          inner(matrix, rowIndex + 1);
+          matrix.togglePiece(rowIndex, col);
+          pieceCount--;
+        }
+      }
+    }
+  };
+
+
+
+  var board = new Board({ n: n });
+  // console.log('created new board');
+  var pieceCount = 0;
+  inner(board, 0);
+  // }
+  //return solCounter
 
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
+
   return solutionCount;
 };
