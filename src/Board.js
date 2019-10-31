@@ -168,13 +168,13 @@
       //check row 0 ,coloum
       //row +1, column +1
 
-        //grab the n index
-        //counter intitiate
-        //iterate from 0 to n
-          //get the row
-          //check if the value at the row at the column. column == row in this case
-          //if 1 then add counter
-            //if counter above 1 then return true
+      //grab the n index
+      //counter intitiate
+      //iterate from 0 to n
+      //get the row
+      //check if the value at the row at the column. column == row in this case
+      //if 1 then add counter
+      //if counter above 1 then return true
       var n = this.attributes.n;
       var counter = 0;
       for (var i = 0; i < n; i++) {
