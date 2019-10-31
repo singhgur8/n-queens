@@ -57,9 +57,6 @@ window.findNRooksSolution = function (n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function (n) {
-  var solutionCount = undefined;
-  // var board = new Board({ n: n });
-  // var pieceCount = 0;
 
   // // reusing code from previous function
   // for (i = 0; i < n; i++) { // for each row, y coordinates
@@ -79,29 +76,57 @@ window.countNRooksSolutions = function (n) {
 
   //-----------------------------------------------------------------------
 
-  //Have an inner function (Current Matrix, Row Index/Coordintes to start from)
-    //creates n children/clones
-      //fills in one row of the matrix, for this child and tests it
-        //if fails stop and go back to next child
-      //else dig deeper, increase the pieceCount
-      // .
-      // .
-      // .
-    //if solution is found, increase the Solutioncount
+  //create solutionCounter, piece counter?? where this go, create empty matrix
+  var solutionCount = 0;
 
-  // recursive inner function is passed a current matrix and a row index
-    // for i < n (iterate through the columns)
-      // toggle i-th element
-      // if no conflicts
-        // create clone
-        // increase piece count
-        // call self recursively with new row index
-      // if conflicts, do nothing--the branch will fall off
-    // once i = n, if piece count = n, increase solutionCount
+  // create inner function
+  var inner = function (matrix, rowIndex) {
+    for (var col = 0; col < n; col++) {
+      // var clone = matrix.clone();
+      if (n === 2) {
+        // debugger;
+      }
+      // console.log(matrix);
+      // console.log('row', rowIndex, 'col', col);
+      matrix.togglePiece(rowIndex, col);
+      console.log('board:');
+      console.log(matrix.get(0));
+      console.log(matrix.get(1));
+      if (matrix.hasAnyRooksConflicts()) {
+        matrix.togglePiece(rowIndex, col);
+      } else {
+        pieceCount++;
+        if (pieceCount === n) {
+          solutionCount++;
+        } else {
+          inner(matrix, rowIndex + 1);
+          matrix.togglePiece(rowIndex, col);
+        }
+      }
+    }
+  };
+  //Have an inner function (Current Matrix, Row Index)
+  //for loop here to go through columns
+  //create a clone
+  //toggle the clones element using rowIndex and ColIndex
+  //if conflcit
+  //do nothing
+  //if no conflict
+  //counter ++
+  //if counter === n
+  //solncounter ++
+  //else
+  //call inner (ClonedMatrix, row+1)
 
 
-
-
+  //start inner function, with intial inputs: iterate over rows and initialize pieceCount
+  for (var row = 0; row < n; row++) {
+    var board = new Board({ n: n });
+    console.log('created new board');
+    var pieceCount = 0;
+    inner(board, row);
+  }
+  //return solCounter
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
