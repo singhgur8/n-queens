@@ -170,26 +170,56 @@ window.findNQueensSolution = function (n) {
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function (n) {
+  // original solution: 50ms
+  // includes optimizations:
+  //   To fit n pieces, each row needs a piece. So if a piece isn't added to a row, discontinue that branch of the tree.
+  // adding optimizations:
+  //   Once a piece is added to a column, no other pieces can be added to that column.
+  //   ^ cuts time down to 47ms
+  //   Once a piece is added, the next row cannot have a piece diagonal to it.
+  //   ^ cuts time down to 42ms
+
   var solutionCount = 0;
-  if (n === 0) {
+  if (n === 0) { // edge case
     return 1;
   }
   // create inner function
-  var inner = function (matrix, rowIndex) {
-    for (var col = 0; col < n; col++) {
+  var inner = function (matrix, rowIndex, colObj, prevCol) {
+    if (prevCol !== undefined) { // reassignation of objects in order to limit columns searched in the below for loop
+      var tempCols = {};
+      Object.assign(tempCols, colObj);
+      delete tempCols[prevCol - 1];
+      delete tempCols[prevCol + 1];
+      var oldCol = colObj;
+      colObj = tempCols;
+    }
+
+    for (var col in colObj) { // by now, colObj should be reduced by 1-3 items
       matrix.togglePiece(rowIndex, col);
       if (matrix.hasAnyQueensConflicts()) {
         matrix.togglePiece(rowIndex, col);
-      } else {
+      } else { // if we keep the piece, do the following things
         pieceCount++;
-        if (pieceCount === n) {
+        delete colObj[col]; // remove this column from the search space
+        if (oldCol !== undefined) {
+          delete oldCol[col];
+        }
+        if (pieceCount === n) { // if we found a solution, do some things
           solutionCount++;
           matrix.togglePiece(rowIndex, col);
           pieceCount--;
-        } else if (rowIndex + 1 < n) {
-          inner(matrix, rowIndex + 1);
-          matrix.togglePiece(rowIndex, col);
-          pieceCount--;
+          if (oldCol !== undefined) {
+            colObj = oldCol;
+          }
+          colObj[col] = col;
+        } else if (rowIndex + 1 < n) { // if this board is incomplete
+          if (oldCol !== undefined) {
+            colObj = oldCol;
+          }
+          inner(matrix, rowIndex + 1, colObj, Number(col)); // call inner function on the next row of the board
+          matrix.togglePiece(rowIndex, col); // going back up the stack/tree, we untoggle our piece, so we can use one board for all decision branches
+          pieceCount--; // for the same reason, decrement the piece count
+          colObj[col] = col; // for the same reason, add the deleted column back in
         }
       }
     }
@@ -198,11 +228,13 @@ window.countNQueensSolutions = function (n) {
 
 
   var board = new Board({ n: n });
-  // console.log('created new board');
   var pieceCount = 0;
-  inner(board, 0);
-  // }
-  //return solCounter
+  var colArr = Array.from(Array(n).keys());
+  var colObj = {};
+  for (var ele of colArr) {
+    colObj[ele] = ele;
+  }
+  inner(board, 0, colObj);
 
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
 
